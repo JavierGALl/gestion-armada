@@ -7,17 +7,15 @@ class TecnologiaSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre']
 
 class FuncionarioSerializer(serializers.ModelSerializer):
-    # Esto hará que en el JSON veamos los nombres de las tecnologías, no solo el ID
-    tecnologias = TecnologiaSerializer(many=True, read_only=True)
+    # 'queryset' permite que enviemos IDs al crear/editar
+    # 'many=True' porque un funcionario tiene varias tecnologías
+    tecnologias_detalle = TecnologiaSerializer(source='tecnologias', many=True, read_only=True)
+    tecnologias = serializers.PrimaryKeyRelatedField(
+        queryset=Tecnologia.objects.all(), 
+        many=True, 
+        write_only=False # Permitimos lectura y escritura por ID
+    )
 
     class Meta:
         model = Funcionario
-        fields = [
-            'id', 
-            'nombre_completo', 
-            'rut', 
-            'grado', 
-            'tecnologias', 
-            'fecha_ingreso', 
-            'activo'
-        ]
+        fields = ['id', 'nombre_completo', 'rut', 'grado', 'tecnologias', 'tecnologias_detalle', 'fecha_ingreso', 'activo']
